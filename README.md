@@ -1,4 +1,4 @@
-# keyauth-cpp-library : Please star 🌟
+# keyauth-cpp-library
 KeyAuth C++ Library
 
 This is the source code of the library_x64.lib file from https://github.com/KeyAuth/KeyAuth-CPP-Example
@@ -9,7 +9,7 @@ Mutli Support : x86/x64
 
 ## **Bugs**
 
-If the default example not added to your software isn't functioning how it should, please report a bug here https://keyauth.site/app/?page=forms
+If the default example not added to your software isn't functioning how it should, please join the Discord server https://discord.gg/keyauth and submit the issue in the `#bugs` channel.
 
 However, we do **NOT** provide support for adding KeyAuth to your project. If you can't figure this out you should use Google or YouTube to learn more about the programming language you want to sell a program in.
 
@@ -41,5 +41,3 @@ x86 :
 3- Lib Configuration -> Advanced -> Character Set ->  Multi-Byte Character Set
 
 4- Lib Configuration -> Preprocessor definiton for CURL -> CURL_STATICLIB
-
-Looking for a Discord bot made by the KeyAuth & RestoreCord founder that you can use to backup your Discord members, server settings, and messages? Go to https://vaultcord.com
