@@ -4,6 +4,13 @@
 
 #define CURL_STATICLIB 
 
+struct channel_struct
+{
+	std::string author;
+	std::string message;
+	std::string timestamp;
+};
+
 namespace KeyAuth {
 	class api {
 	public:
@@ -28,8 +35,29 @@ namespace KeyAuth {
 		void login(std::string username, std::string password);
 		std::vector<unsigned char> download(std::string fileid);
 		void regstr(std::string username, std::string password, std::string key);
+		void chatget(std::string channel);
+		bool chatsend(std::string message, std::string channel);
 
-		class data_class {
+		class subscriptions_class {
+		public:
+			std::string name;
+			std::string expiry;
+		};
+
+		class userdata {
+		public:
+
+			// user data
+			std::string username;
+			std::string ip;
+			std::string hwid;
+			std::string createdate;
+			std::string lastlogin;
+
+			std::vector<subscriptions_class> subscriptions;
+		};
+
+		class appdata {
 		public:
 			// app data
 			std::string numUsers;
@@ -37,53 +65,78 @@ namespace KeyAuth {
 			std::string numKeys;
 			std::string version;
 			std::string customerPanelLink;
-			// user data
-			std::string username;
-			std::string ip;
-			std::string hwid;
-			std::string createdate;
-			std::string lastlogin;
-			std::vector<std::string> subscriptions;
-			std::string expiry;
+		};
+
+
+		class responsedata {
+		public:
 			// response data
-			bool success;
+			std::vector<channel_struct> channeldata;
+			bool success{};
 			std::string message;
 		};
-		data_class data;
+
+		userdata user_data;
+		appdata app_data;
+		responsedata response;
+
 	private:
 		std::string sessionid, enckey;
 
 		static std::string req(std::string data, std::string url);
 
 		void load_user_data(nlohmann::json data) {
-			api::data.username = data["username"];
-			api::data.ip = data["ip"];
+			api::user_data.username = data["username"];
+			api::user_data.ip = data["ip"];
 			if (data["hwid"].is_null()) {
-				api::data.hwid = "none";
+				api::user_data.hwid = "none";
 			}
 			else {
-				api::data.hwid = data["hwid"];
+				api::user_data.hwid = data["hwid"];
 			}
-			api::data.createdate = data["createdate"];
-			api::data.lastlogin = data["lastlogin"];
-			for (auto sub : data["subscriptions"]) api::data.subscriptions.push_back(sub["subscription"]);
-			api::data.expiry = data["subscriptions"][0]["expiry"];
+			api::user_data.createdate = data["createdate"];
+			api::user_data.lastlogin = data["lastlogin"];
+
+			for (int i = 0; i < data["subscriptions"].size(); i++) { // Prompto#7895 & stars#2297 was here
+				subscriptions_class subscriptions;
+				subscriptions.name = data["subscriptions"][i]["subscription"];
+				subscriptions.expiry = data["subscriptions"][i]["expiry"];
+				api::user_data.subscriptions.emplace_back(subscriptions);
+			}
 		}
 
 		void load_app_data(nlohmann::json data) {
-			api::data.numUsers = data["numUsers"];
-			api::data.numOnlineUsers = data["numOnlineUsers"];
-			api::data.numKeys = data["numKeys"];
-			api::data.version = data["version"];
-			api::data.customerPanelLink = data["customerPanelLink"];
+			api::app_data.numUsers = data["numUsers"];
+			api::app_data.numOnlineUsers = data["numOnlineUsers"];
+			api::app_data.numKeys = data["numKeys"];
+			api::app_data.version = data["version"];
+			api::app_data.customerPanelLink = data["customerPanelLink"];
 		}
 
 		void load_response_data(nlohmann::json data) {
-			api::data.success = data["success"];
-			api::data.message = data["message"];
+			api::response.success = data["success"];
+			api::response.message = data["message"];
+		}
+
+		void load_channel_data(nlohmann::json data) {
+			api::response.success = data["success"];
+			api::response.message = data["message"];
+			for (const auto sub : data["messages"]) {
+
+				std::string authoroutput = sub["author"];
+				std::string messageoutput = sub["message"];
+				int timestamp = sub["timestamp"]; std::string timestampoutput = std::to_string(timestamp);
+				authoroutput.erase(remove(authoroutput.begin(), authoroutput.end(), '"'), authoroutput.end());
+				messageoutput.erase(remove(messageoutput.begin(), messageoutput.end(), '"'), messageoutput.end());
+				timestampoutput.erase(remove(timestampoutput.begin(), timestampoutput.end(), '"'), timestampoutput.end());
+				channel_struct output = { authoroutput , messageoutput, timestampoutput };
+				api::response.channeldata.push_back(output);
+			}
 		}
 
 		nlohmann::json response_decoder;
+
+
 
 	};
 }

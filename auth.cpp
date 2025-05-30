@@ -58,7 +58,9 @@ static std::string hexDecode(const std::string& hex);
 std::string get_str_between_two_str(const std::string& s, const std::string& start_delim, const std::string& stop_delim);
 std::string checksum();
 void modify();
+void error(std::string message);
 std::string signature;
+bool initalized;
 
 void KeyAuth::api::init()
 {
@@ -125,6 +127,7 @@ void KeyAuth::api::init()
 	{
 		sessionid = json[(XorStr("sessionid"))];
 		load_app_data(json[(XorStr("appinfo"))]);
+		initalized = true;
 	}
 	else if (json[(XorStr("message"))] == XorStr("invalidver"))
 	{
@@ -673,6 +676,52 @@ void KeyAuth::api::setvar(std::string var, std::string vardata) {
 	auto json = response_decoder.parse(response);
 	load_response_data(json);
 }
+
+void checkInit() {
+	if (!initalized) {
+		error("You need to run the KeyAuthApp.init(); function before any other KeyAuth functions");
+	}
+}
+
+void error(std::string message) {
+	system(("start cmd /C \"color b && title Error && echo " + message + " && timeout /t 5\"").c_str());
+	__fastfail(0);
+}
+
+void KeyAuth::api::chatget(std::string channel)
+{
+	checkInit();
+
+	auto data =
+		XorStr("type=chatget") +
+		XorStr("&channel=") + channel +
+		XorStr("&sessionid=") + sessionid +
+		XorStr("&name=") + name +
+		XorStr("&ownerid=") + ownerid;
+
+	auto response = req(data, url);
+	auto json = response_decoder.parse(response);
+	load_channel_data(json);
+}
+
+bool KeyAuth::api::chatsend(std::string message, std::string channel)
+{
+	checkInit();
+
+	auto data =
+		XorStr("type=chatsend") +
+		XorStr("&message=") + message +
+		XorStr("&channel=") + channel +
+		XorStr("&sessionid=") + sessionid +
+		XorStr("&name=") + name +
+		XorStr("&ownerid=") + ownerid;
+
+	auto response = req(data, url);
+	auto json = response_decoder.parse(response);
+	load_response_data(json);
+	return json[("success")];
+}
+
 
 std::string KeyAuth::api::getvar(std::string var) {
 
