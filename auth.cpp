@@ -77,7 +77,7 @@ void cleanUpSeedData(const std::string& seed);
 std::string signature;
 std::string signatureTimestamp;
 bool initialized;
-std::string API_PUBLIC_KEY = "5586b4bc69c7a4b487e4563a4cd96afd39140f919bd31cea7d1c6a1e8439422b";
+std::string API_PUBLIC_KEY = "95b38710f40927b16528a073b87d942e03bd4578d49963a19ebae177945f89ac";
 bool KeyAuth::api::debug = false;
 std::atomic<bool> LoggedIn(false);
 
