@@ -1,7 +1,7 @@
 # keyauth-cpp-library
 KeyAuth C++ Library
 
-This is the source code of the library_x64.lib file from https://github.com/KeyAuth/KeyAuth-CPP-Example
+This is the source code of the library_x64.lib file from https://github.com/KeyAuth-site/KeyAuth-CPP-Example
 
 **This is NOT open-source, in respect to copyright usage. Commercial use is prohibited, read below for further clarification**
 
