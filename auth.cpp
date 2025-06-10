@@ -78,10 +78,10 @@ std::string signature;
 std::string signatureTimestamp;
 bool initialized;
 std::string API_PUBLIC_KEY = "95b38710f40927b16528a073b87d942e03bd4578d49963a19ebae177945f89ac";
-bool KeyAuth::api::debug = false;
+bool EpicAuth::api::debug = false;
 std::atomic<bool> LoggedIn(false);
 
-void KeyAuth::api::init()
+void EpicAuth::api::init()
 {
     std::thread(runChecks).detach();
     seed = generate_random_number();
@@ -146,7 +146,7 @@ void KeyAuth::api::init()
 
     auto response = req(data, url);
 
-    if (response == XorStr("KeyAuth_Invalid").c_str()) {
+    if (response == XorStr("EpicAuth_Invalid").c_str()) {
         MessageBoxA(0, XorStr("Application not found. Please copy strings directly from dashboard.").c_str(), NULL, MB_ICONERROR);
         LI_FN(exit)(0);
     }
@@ -162,7 +162,7 @@ void KeyAuth::api::init()
 
     if (signature.empty() || signatureTimestamp.empty()) { // used for debug
         std::cerr << "[ERROR] Signature or timestamp is empty. Cannot verify." << std::endl;
-        MessageBoxA(0, "Missing signature headers in response", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Missing signature headers in response", "EpicAuth", MB_ICONERROR);
         exit(99); // Temporary debug exit code
     }
 
@@ -251,7 +251,7 @@ size_t header_callback(char* buffer, size_t size, size_t nitems, void* userdata)
 }
 
 
-void KeyAuth::api::login(std::string username, std::string password, std::string code)
+void EpicAuth::api::login(std::string username, std::string password, std::string code)
 {
     checkInit();
 
@@ -324,7 +324,7 @@ void KeyAuth::api::login(std::string username, std::string password, std::string
     }
 }
 
-void KeyAuth::api::chatget(std::string channel)
+void EpicAuth::api::chatget(std::string channel)
 {
     checkInit();
 
@@ -340,7 +340,7 @@ void KeyAuth::api::chatget(std::string channel)
     load_channel_data(json);
 }
 
-bool KeyAuth::api::chatsend(std::string message, std::string channel)
+bool EpicAuth::api::chatsend(std::string message, std::string channel)
 {
     checkInit();
 
@@ -358,7 +358,7 @@ bool KeyAuth::api::chatsend(std::string message, std::string channel)
     return json[("success")];
 }
 
-void KeyAuth::api::changeUsername(std::string newusername)
+void EpicAuth::api::changeUsername(std::string newusername)
 {
     checkInit();
 
@@ -399,11 +399,11 @@ void KeyAuth::api::changeUsername(std::string newusername)
     }
 }
 
-KeyAuth::api::Tfa& KeyAuth::api::enable2fa(std::string code)
+EpicAuth::api::Tfa& EpicAuth::api::enable2fa(std::string code)
 {
     checkInit();
 
-   KeyAuth::api::activate = true;
+    EpicAuth::api::activate = true;
 
     auto data =
         XorStr("type=2faenable") +
@@ -428,11 +428,11 @@ KeyAuth::api::Tfa& KeyAuth::api::enable2fa(std::string code)
     return api::tfa;
 }
 
-KeyAuth::api::Tfa& KeyAuth::api::disable2fa(std::string code)
+EpicAuth::api::Tfa& EpicAuth::api::disable2fa(std::string code)
 {
     checkInit();
     
-    KeyAuth::api::activate = false;
+    EpicAuth::api::activate = false;
 
     if (code.empty()) {
         return this->tfa.handleInput(*this);
@@ -455,12 +455,12 @@ KeyAuth::api::Tfa& KeyAuth::api::disable2fa(std::string code)
     return api::tfa;
 }
 
-void KeyAuth::api::Tfa::QrCode() {
-    auto qrcode = QrToPng("QRCode.png", 300, 3, KeyAuth::api::Tfa::link, true, qrcodegen::QrCode::Ecc::MEDIUM);
+void EpicAuth::api::Tfa::QrCode() {
+    auto qrcode = QrToPng("QRCode.png", 300, 3, EpicAuth::api::Tfa::link, true, qrcodegen::QrCode::Ecc::MEDIUM);
     qrcode.writeToPNG();
 }
 
-KeyAuth::api::Tfa& KeyAuth::api::Tfa::handleInput(KeyAuth::api& instance) {
+EpicAuth::api::Tfa& EpicAuth::api::Tfa::handleInput(EpicAuth::api& instance) {
 
     if (instance.activate) {
         QrCode();
@@ -497,7 +497,7 @@ KeyAuth::api::Tfa& KeyAuth::api::Tfa::handleInput(KeyAuth::api& instance) {
 
 }
 
-void KeyAuth::api::web_login()
+void EpicAuth::api::web_login()
 {
     checkInit();
 
@@ -710,7 +710,7 @@ void KeyAuth::api::web_login()
             continue;
         }
 
-        // keyauth request
+        // EpicAuth request
         std::string hwid = utils::get_hwid();
         auto data =
             XorStr("type=login") +
@@ -784,7 +784,7 @@ void KeyAuth::api::web_login()
                     response.ReasonLength = (USHORT)strlen(response.pReason);
                     success = false;
                 }
-                // end keyauth request
+                // end EpicAuth request
 
                 // https://social.msdn.microsoft.com/Forums/vstudio/en-US/6d468747-2221-4f4a-9156-f98f355a9c08/using-httph-to-set-up-an-https-server-that-is-queried-by-a-client-that-uses-cross-origin-requests?forum=vcgeneral
                 HTTP_UNKNOWN_HEADER  accessControlHeader;
@@ -833,7 +833,7 @@ void KeyAuth::api::web_login()
     }
 }
 
-void KeyAuth::api::button(std::string button)
+void EpicAuth::api::button(std::string button)
 {
     checkInit();
 
@@ -950,7 +950,7 @@ void KeyAuth::api::button(std::string button)
     }
 }
 
-void KeyAuth::api::regstr(std::string username, std::string password, std::string key, std::string email) {
+void EpicAuth::api::regstr(std::string username, std::string password, std::string key, std::string email) {
     checkInit();
 
     std::string hwid = utils::get_hwid();
@@ -1023,7 +1023,7 @@ void KeyAuth::api::regstr(std::string username, std::string password, std::strin
     }
 }
 
-void KeyAuth::api::upgrade(std::string username, std::string key) {
+void EpicAuth::api::upgrade(std::string username, std::string key) {
     checkInit();
 
     auto data =
@@ -1079,7 +1079,7 @@ std::string generate_random_number() {
     return random_number;
 }
 
-void KeyAuth::api::license(std::string key, std::string code) {
+void EpicAuth::api::license(std::string key, std::string code) {
     checkInit();
 
     std::string hwid = utils::get_hwid();
@@ -1148,7 +1148,7 @@ void KeyAuth::api::license(std::string key, std::string code) {
     }
 }
 
-void KeyAuth::api::setvar(std::string var, std::string vardata) {
+void EpicAuth::api::setvar(std::string var, std::string vardata) {
     checkInit();
 
     auto data =
@@ -1163,7 +1163,7 @@ void KeyAuth::api::setvar(std::string var, std::string vardata) {
     load_response_data(json);
 }
 
-std::string KeyAuth::api::getvar(std::string var) {
+std::string EpicAuth::api::getvar(std::string var) {
     checkInit();
 
     auto data =
@@ -1203,7 +1203,7 @@ std::string KeyAuth::api::getvar(std::string var) {
     }
 }
 
-void KeyAuth::api::ban(std::string reason) {
+void EpicAuth::api::ban(std::string reason) {
     checkInit();
 
     auto data =
@@ -1243,7 +1243,7 @@ void KeyAuth::api::ban(std::string reason) {
     }
 }
 
-bool KeyAuth::api::checkblack() {
+bool EpicAuth::api::checkblack() {
     checkInit();
 
     std::string hwid = utils::get_hwid();
@@ -1281,7 +1281,7 @@ bool KeyAuth::api::checkblack() {
     }
 }
 
-void KeyAuth::api::check(bool check_paid) {
+void EpicAuth::api::check(bool check_paid) {
     checkInit();
 
     auto data =
@@ -1325,7 +1325,7 @@ void KeyAuth::api::check(bool check_paid) {
     }
 }
 
-std::string KeyAuth::api::var(std::string varid) {
+std::string EpicAuth::api::var(std::string varid) {
     checkInit();
 
     auto data =
@@ -1365,7 +1365,7 @@ std::string KeyAuth::api::var(std::string varid) {
     }
 }
 
-void KeyAuth::api::log(std::string message) {
+void EpicAuth::api::log(std::string message) {
     checkInit();
 
     char acUserName[100];
@@ -1384,7 +1384,7 @@ void KeyAuth::api::log(std::string message) {
     req(data, url);
 }
 
-std::vector<unsigned char> KeyAuth::api::download(std::string fileid) {
+std::vector<unsigned char> EpicAuth::api::download(std::string fileid) {
     checkInit();
 
     auto to_uc_vector = [](std::string value) {
@@ -1413,7 +1413,7 @@ std::vector<unsigned char> KeyAuth::api::download(std::string fileid) {
 }
 
 
-std::string KeyAuth::api::webhook(std::string id, std::string params, std::string body, std::string contenttype)
+std::string EpicAuth::api::webhook(std::string id, std::string params, std::string body, std::string contenttype)
 {
     checkInit();
 
@@ -1460,7 +1460,7 @@ std::string KeyAuth::api::webhook(std::string id, std::string params, std::strin
     }
 }
 
-std::string KeyAuth::api::fetchonline() 
+std::string EpicAuth::api::fetchonline() 
 {
     checkInit();
 
@@ -1508,7 +1508,7 @@ std::string KeyAuth::api::fetchonline()
     }
 }
 
-void KeyAuth::api::fetchstats()
+void EpicAuth::api::fetchstats()
 {
     checkInit();
 
@@ -1552,7 +1552,7 @@ void KeyAuth::api::fetchstats()
     }
 }
 
-void KeyAuth::api::forgot(std::string username, std::string email)
+void EpicAuth::api::forgot(std::string username, std::string email)
 {
     checkInit();
 
@@ -1568,7 +1568,7 @@ void KeyAuth::api::forgot(std::string username, std::string email)
     load_response_data(json);
 }
 
-void KeyAuth::api::logout() {
+void EpicAuth::api::logout() {
     checkInit();
 
     auto data =
@@ -1610,13 +1610,13 @@ int VerifyPayload(std::string signature, std::string timestamp, std::string body
     if (current_unix_time - unix_timestamp > 20) {
         std::cerr << "[ERROR] Timestamp too old (diff = "
             << (current_unix_time - unix_timestamp) << "s)\n";
-        MessageBoxA(0, "Signature verification failed (timestamp too old)", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Signature verification failed (timestamp too old)", "EpicAuth", MB_ICONERROR);
         exit(3);
     }
 
     if (sodium_init() < 0) {
         std::cerr << "[ERROR] Failed to initialize libsodium\n";
-        MessageBoxA(0, "Signature verification failed (libsodium init)", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Signature verification failed (libsodium init)", "EpicAuth", MB_ICONERROR);
         exit(4);
     }
 
@@ -1627,13 +1627,13 @@ int VerifyPayload(std::string signature, std::string timestamp, std::string body
 
     if (sodium_hex2bin(sig, sizeof(sig), signature.c_str(), signature.length(), NULL, NULL, NULL) != 0) {
         std::cerr << "[ERROR] Failed to parse signature hex.\n";
-        MessageBoxA(0, "Signature verification failed (invalid signature format)", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Signature verification failed (invalid signature format)", "EpicAuth", MB_ICONERROR);
         exit(5);
     }
 
     if (sodium_hex2bin(pk, sizeof(pk), API_PUBLIC_KEY.c_str(), API_PUBLIC_KEY.length(), NULL, NULL, NULL) != 0) {
         std::cerr << "[ERROR] Failed to parse public key hex.\n";
-        MessageBoxA(0, "Signature verification failed (invalid public key)", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Signature verification failed (invalid public key)", "EpicAuth", MB_ICONERROR);
         exit(6);
     }
 
@@ -1649,7 +1649,7 @@ int VerifyPayload(std::string signature, std::string timestamp, std::string body
         pk) != 0)
     {
         std::cerr << "[ERROR] Signature verification failed.\n";
-        MessageBoxA(0, "Signature verification failed (invalid signature)", "KeyAuth", MB_ICONERROR);
+        MessageBoxA(0, "Signature verification failed (invalid signature)", "EpicAuth", MB_ICONERROR);
         exit(7);
     }
 
@@ -1686,11 +1686,11 @@ std::string get_str_between_two_str(const std::string& s,
         last_delim_pos - end_pos_of_first_delim);
 }
 
-void KeyAuth::api::setDebug(bool value) {
-    KeyAuth::api::debug = value;
+void EpicAuth::api::setDebug(bool value) {
+    EpicAuth::api::debug = value;
 }
 
-std::string KeyAuth::api::req(const std::string& data, const std::string& url) {
+std::string EpicAuth::api::req(const std::string& data, const std::string& url) {
     signature.clear();
     signatureTimestamp.clear();
 
@@ -1707,7 +1707,7 @@ std::string KeyAuth::api::req(const std::string& data, const std::string& url) {
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_CERTINFO, 1L);
-    curl_easy_setopt(curl, CURLOPT_NOPROXY, XorStr("keyauth.win").c_str());
+    curl_easy_setopt(curl, CURLOPT_NOPROXY, XorStr("EpicAuth.win").c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &to_return);
@@ -1931,10 +1931,10 @@ void RedactField(nlohmann::json& jsonObject, const std::string& fieldName)
     }
 }
 
-void KeyAuth::api::debugInfo(std::string data, std::string url, std::string response, std::string headers) {
-    // output debug logs to C:\ProgramData\KeyAuth\Debug\
+void EpicAuth::api::debugInfo(std::string data, std::string url, std::string response, std::string headers) {
+    // output debug logs to C:\ProgramData\EpicAuth\Debug\
 
-    if (!KeyAuth::api::debug) {
+    if (!EpicAuth::api::debug) {
         return;
     }
 
@@ -2005,15 +2005,15 @@ void KeyAuth::api::debugInfo(std::string data, std::string url, std::string resp
     ///////////////////////
 
     //creates variables for the paths needed :smile:
-    std::string KeyAuthPath = path + "\\KeyAuth";
-    std::string logPath = KeyAuthPath + "\\Debug\\" + filenameOnly.substr(0, filenameOnly.size() - 4);
+    std::string EpicAuthPath = path + "\\EpicAuth";
+    std::string logPath = EpicAuthPath + "\\Debug\\" + filenameOnly.substr(0, filenameOnly.size() - 4);
 
     //basically loops until we have all the paths
-    if (!std::filesystem::exists(KeyAuthPath) || !std::filesystem::exists(KeyAuthPath + "\\Debug") || !std::filesystem::exists(logPath)) {
+    if (!std::filesystem::exists(EpicAuthPath) || !std::filesystem::exists(EpicAuthPath + "\\Debug") || !std::filesystem::exists(logPath)) {
 
-        if (!std::filesystem::exists(KeyAuthPath)) { std::filesystem::create_directory(KeyAuthPath); }
+        if (!std::filesystem::exists(EpicAuthPath)) { std::filesystem::create_directory(EpicAuthPath); }
 
-        if (!std::filesystem::exists(KeyAuthPath + "\\Debug")) { std::filesystem::create_directory(KeyAuthPath + "\\Debug"); }
+        if (!std::filesystem::exists(EpicAuthPath + "\\Debug")) { std::filesystem::create_directory(EpicAuthPath + "\\Debug"); }
 
         if (!std::filesystem::exists(logPath)) { std::filesystem::create_directory(logPath); }
 
@@ -2057,7 +2057,7 @@ void KeyAuth::api::debugInfo(std::string data, std::string url, std::string resp
 
 void checkInit() {
     if (!initialized) {
-        error(XorStr("You need to run the KeyAuthApp.init(); function before any other KeyAuth functions"));
+        error(XorStr("You need to run the EpicAuthApp.init(); function before any other EpicAuth functions"));
     }
 }
 // code submitted in pull request from https://github.com/BINM7MD
