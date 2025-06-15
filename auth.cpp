@@ -1707,7 +1707,7 @@ std::string EpicAuth::api::req(const std::string& data, const std::string& url) 
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
     curl_easy_setopt(curl, CURLOPT_CERTINFO, 1L);
-    curl_easy_setopt(curl, CURLOPT_NOPROXY, XorStr("EpicAuth.win").c_str());
+    curl_easy_setopt(curl, CURLOPT_NOPROXY, XorStr("EpicAuth.cc").c_str());
     curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &to_return);
