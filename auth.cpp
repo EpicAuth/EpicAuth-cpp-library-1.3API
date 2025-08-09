@@ -288,7 +288,23 @@ void EpicAuth::api::login(std::string username, std::string password, std::strin
         if (!json[(XorStr("success"))] || (json[(XorStr("success"))] && (resultCode == expectedHash))) {
             load_response_data(json);
             if (json[(XorStr("success"))])
+            {
                 load_user_data(json[(XorStr("info"))]);
+            }
+            else if (json[(XorStr("message"))] == XorStr("invalidver"))
+            {
+                std::string dl = json[(XorStr("download"))];
+                api::app_data.downloadLink = json[XorStr("download")];
+                if (dl == "")
+                {
+                    MessageBoxA(0, XorStr("Version in the loader does match the one on the dashboard, and the download link on dashboard is blank.\n\nTo fix this, either fix the loader so it matches the version on the dashboard. Or if you intended for it to have different versions, update the download link on dashboard so it will auto-update correctly.").c_str(), NULL, MB_ICONERROR);
+                }
+                else
+                {
+                    ShellExecuteA(0, XorStr("open").c_str(), dl.c_str(), 0, 0, SW_SHOWNORMAL);
+                }
+                LI_FN(exit)(0);
+            }
 
             if (api::response.message != XorStr("Initialized").c_str()) {
                 LI_FN(GlobalAddAtomA)(seed.c_str());
@@ -986,7 +1002,23 @@ void EpicAuth::api::regstr(std::string username, std::string password, std::stri
 
             load_response_data(json);
             if (json[(XorStr("success"))])
+            {
                 load_user_data(json[(XorStr("info"))]);
+            }
+            else if (json[(XorStr("message"))] == XorStr("invalidver"))
+            {
+                std::string dl = json[(XorStr("download"))];
+                api::app_data.downloadLink = json[XorStr("download")];
+                if (dl == "")
+                {
+                    MessageBoxA(0, XorStr("Version in the loader does match the one on the dashboard, and the download link on dashboard is blank.\n\nTo fix this, either fix the loader so it matches the version on the dashboard. Or if you intended for it to have different versions, update the download link on dashboard so it will auto-update correctly.").c_str(), NULL, MB_ICONERROR);
+                }
+                else
+                {
+                    ShellExecuteA(0, XorStr("open").c_str(), dl.c_str(), 0, 0, SW_SHOWNORMAL);
+                }
+                LI_FN(exit)(0);
+            }
 
             if (api::response.message != XorStr("Initialized").c_str()) {
                 LI_FN(GlobalAddAtomA)(seed.c_str());
@@ -1112,7 +1144,23 @@ void EpicAuth::api::license(std::string key, std::string code) {
         if (!json[(XorStr("success"))] || (json[(XorStr("success"))] && (resultCode == expectedHash))) {
             load_response_data(json);
             if (json[(XorStr("success"))])
+            {
                 load_user_data(json[(XorStr("info"))]);
+            }
+            else if (json[(XorStr("message"))] == XorStr("invalidver"))
+            {
+                std::string dl = json[(XorStr("download"))];
+                api::app_data.downloadLink = json[XorStr("download")];
+                if (dl == "")
+                {
+                    MessageBoxA(0, XorStr("Version in the loader does match the one on the dashboard, and the download link on dashboard is blank.\n\nTo fix this, either fix the loader so it matches the version on the dashboard. Or if you intended for it to have different versions, update the download link on dashboard so it will auto-update correctly.").c_str(), NULL, MB_ICONERROR);
+                }
+                else
+                {
+                    ShellExecuteA(0, XorStr("open").c_str(), dl.c_str(), 0, 0, SW_SHOWNORMAL);
+                }
+                LI_FN(exit)(0);
+            }
 
             if (api::response.message != XorStr("Initialized").c_str()) {
                 LI_FN(GlobalAddAtomA)(seed.c_str());
